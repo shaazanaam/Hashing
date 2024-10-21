@@ -82,11 +82,19 @@ app.post("/register", async (req, res) => {
             [email, hash]
           );
           const user = result.rows[0];
+          //// We are getting back the details of the new user that we just added through the registration route
+          // The we are using the req.login instead of the res.render("secrets.ejs")
+          // SO req.login comes back from passport and  we will pass the same user that we just created using the insert
+          // and then use it to save it to the session by just passing it to the req.login
+          // when we call the req.login it automatically authenticates our user
+          // then passses this user's information to the session to be saved and serialized and then deserialized
+          // and aafter that when we are able to get to the app.get("/secrets") route we will stil be able to log that new user that
+          // we just introduced using the register route
           req.login(user,(err)=>{
             console.log(err);
             res.redirect("/secrets")
           })
-          res.render("secrets.ejs");
+         
         }
       });
     }
@@ -168,6 +176,12 @@ passport.use(new Strategy(async function verify(username, password, cb){
 // All it does is it registers the function used to serialize the objects ( User in our case)
 // SO that we can save the data of the user who's logged  in to the local storage
 // And we are using the call back to pass over any of the details of the user
+// In our case see how the user that got serialized and deserialized got printed in the console
+/* {
+  id: 7,
+  email: 'test5@gmail.com',
+  password: '$2b$10$srHzK6lucPwZZp51GF5RXu/pWw5W0f2HxmUMff6nMRlCdRyVX8cuC'
+*/
 
 /*  (method) passport.Authenticator<e.Handler, any, any, passport.AuthenticateOptions>
 .serializeUser<any>(fn: (user: Express.User, done: (err: any, id?: any) => void) => 
